@@ -5,15 +5,18 @@ const apiStopScanning = 'StopScanning';
 const apiGetAvailableDevices = 'GetAvailableDevices';
 const apiOpen = 'Open'
 const apiClose = 'Close'
+const deviceDiscoveryRefreshRateMs = 500;
+var device = null;
 
 //variables
 var isScanning = false;
 
 //UI elements
 const btnStartStop = document.getElementById('btnStartStop');
+const ddDevices = document.getElementById('ddDevices');
 
 //scan for available devices
-const scanningTask = setInterval(GetAvailableDevices, 500);
+const scanningTask = setInterval(GetAvailableDevices, deviceDiscoveryRefreshRateMs);
 
 //start scanning for devices
 try{
@@ -29,6 +32,7 @@ btnStartStop.addEventListener('click', () => {
 });
 
 async function GetAvailableDevices() {
+    //TODO UPDATE DROPDOWN
     await SendAPIRequest(apiGetAvailableDevices);
 }
 
