@@ -4,18 +4,24 @@
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' http://localhost:5832">
+    <link rel="stylesheet" href="styles.css">
     <title>EEG Dashboard</title>
   </head>
   <body>
-    <h1>Available Devices:</h1>
-    <div id="divDevices"></div>
-    
-<!--    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
-    <select id="ddDevices"></select>
-    <button id="btnStartStop">Start Scanning</button>-->
-    <button id="btnOpen">Open</button>
+    <div class="dlgDevices">
+      <div class="prtTop">
+          <h2>Available Devices:</h2>
+      </div>
+      
+      <div class="prtMid">
+        <div class="divDevices" id="divDevices"></div>
+      </div>
+      
+      <div class="prtBottom">
+          <!--<button id="btnOpen">Open</button>-->
+          <p>Select device to open and start data acquisition</p>
+      </div>
+    </div>    
     <script src="renderer.js"></script>
   </body>
 </html>

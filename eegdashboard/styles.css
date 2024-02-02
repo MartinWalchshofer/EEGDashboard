@@ -1,0 +1,38 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #22333b;
+}
+
+.divDevices {
+    width: 50%;
+    text-align: center;
+}
+
+.device:hover
+ {
+    color: darkgray;
+ }
+
+body, html {
+    height: 100%;
+    margin: 0;
+    background-color: #22333b;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.outer-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.prtTop, .prtBottom {
+    margin: 20px 0; 
+}
