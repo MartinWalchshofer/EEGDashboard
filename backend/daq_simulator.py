@@ -3,7 +3,7 @@ import time
 import random
 
 class DAQSimulator:
-    __deviceName = ['UH-0000.00.00', 'UH-0000.00.01']
+    __deviceName = ['DAQ-0000.00.00', 'DAQ-0000.00.01']
     __isScanning = False
     __eventHandlers = []
 
@@ -11,7 +11,7 @@ class DAQSimulator:
     def start_scanning():
         if not DAQSimulator.__isScanning:
             DAQSimulator.__isScanning = True
-            DAQSimulator._on_devices_discovered(DAQSimulator.__deviceName)
+            DAQSimulator.__on_devices_discovered(DAQSimulator.__deviceName)
 
     @staticmethod
     def stop_scanning():
@@ -27,7 +27,7 @@ class DAQSimulator:
         DAQSimulator.__eventHandlers.remove(handler)
 
     @staticmethod
-    def _on_devices_discovered(*args, **kwargs):
+    def __on_devices_discovered(*args, **kwargs):
         for handler in DAQSimulator.__eventHandlers:
             handler(*args, **kwargs)
         
@@ -38,23 +38,23 @@ class DAQSimulator:
         self.__acquisitionRunning = False
         self.__acquisitionThread = None
         self.__eventHandlers = []
-        self._open()
+        self.__open()
 
     def __del__(self):
-        self._close()
+        self.__close()
 
-    def _open(self):
+    def __open(self):
         if not self.__acquisitionRunning:
             self.__acquisitionRunning = True
-            self.__acquisitionThread = threading.Thread(target=self._acquisitionThread_dowork)
+            self.__acquisitionThread = threading.Thread(target=self.__acquisitionThread_dowork)
             self.__acquisitionThread.start()
            
-    def _close(self):
+    def __close(self):
         if self.__acquisitionRunning:
             self.__acquisitionRunning = False
             self.__acquisitionThread.join(500)
 
-    def _acquisitionThread_dowork(self):
+    def __acquisitionThread_dowork(self):
         while self.__acquisitionRunning:
             time.sleep(1/self.sampling_rate)
             data = [0]*self.channel_count
