@@ -11,7 +11,7 @@ const fullApiPath = 'http://' + serverPath + ':' + communicationPort + apiPath;
 const apiStartScanning = 'StartScanning';
 const apiStopScanning = 'StopScanning';
 const apiGetAvailableDevices = 'GetAvailableDevices';
-const apiOpen = 'Open';             //TODO
+const apiOpen = 'Open';
 const apiClose = 'Close';           //TODO
 const deviceDiscoveryRefreshRateMs = 500;
 
@@ -23,6 +23,14 @@ var dataSocket = null;
 
 //UI elements
 const divDevices = document.getElementById('divDevices');
+const dlgDevices = document.getElementById('dlgDevices');
+const dlgMain = document.getElementById('dlgMain');
+//document.querySelector("dlgDevices").style.display = "none";
+//document.querySelector("dlgMain").style.display = "block";
+
+//TODO PUT INTO OWN FUNCTION
+dlgMain.style.display = 'none';
+dlgDevices.style.display = 'block';
 
 //start scanning for devices
 var scanningTask = null;
@@ -60,6 +68,15 @@ async function Open(deviceName){
     //attach to websocket
     if(dataSocket == null)
         dataSocket = new WebSocket(fullWsPath);
+
+    //TODO PUT INTO OWN FUNCTION
+    dlgDevices.style.display = 'none';
+    dlgMain.style.display = 'block';
+}
+
+async function Close()
+{
+    
 }
 
 async function StartScanning() { 

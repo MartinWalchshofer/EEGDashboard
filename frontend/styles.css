@@ -7,6 +7,10 @@ body {
     background-color: #22333b;
 }
 
+.dlg
+{
+    display: none;
+}
 .divDevices {
     width: 50%;
     text-align: center;
