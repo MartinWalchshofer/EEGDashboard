@@ -44,7 +44,7 @@ try{
 }
 catch (error) {
     //stop scanning
-    StopScanning(scanningTask);
+    StopScanning();
     
     console.error('Message', 'Ensure that the backend server is running.')
     console.error('Error:', error);
@@ -66,10 +66,9 @@ async function StartScanning() {
     console.log(await SendAPIRequest(apiStartScanning, null));
     scanningTask = setInterval(GetAvailableDevices, deviceDiscoveryRefreshRateMs);
     isScanning = true;
-    return scanningTask;
 }
 
-async function StopScanning(scanningTask) {
+async function StopScanning() {
     if(scanningTask != null)
         clearInterval(scanningTask);
     if(isScanning){
@@ -103,9 +102,10 @@ async function GetAvailableDevices() {
 async function SendAPIRequest(command, arguments) {
     var jsCmd;
     if(arguments != null)
-        jsCmd = JSON.stringify({ cmd: command }, {args: arguments});
+        jsCmd = JSON.stringify({ cmd: command , args: arguments});
     else
         jsCmd = JSON.stringify({ cmd: command });
+    console.log(jsCmd)
     const response = await fetch(fullApiPath, {
         method: 'POST',
         headers: {

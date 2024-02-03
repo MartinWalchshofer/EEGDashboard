@@ -39,8 +39,9 @@ async def create_item(item_data: dict):
     elif command == apiOpen:
         deviceName = item_data.get('args')
         if deviceName not in discovered_devices:
-            raise HTTPException(status_code=400, detail="Device not found")
+            raise HTTPException(status_code=400, detail= deviceName + 'not found.')
         device = DAQSimulator(deviceName, samplingRate, numberOfChannels)
+        res = {"msg": 'Connected to' + deviceName}
         device.add_data_available_eventhandler(on_data_available)
     elif command == apiClose:
         device.remove_data_available_eventhandler(on_data_available)
