@@ -1,3 +1,5 @@
+const WebSocket = require('ws');
+
 //API functions
 const apiPath = 'http://localhost:5832/api/' // TODO PUT INTO .env
 const apiStartScanning = 'StartScanning';
@@ -8,66 +10,94 @@ const apiClose = 'Close'
 const deviceDiscoveryRefreshRateMs = 500;
 
 //variables
+var devices = []
 var isScanning = false;
-
+var backendReachable = false;
 //UI elements
-const btnStartStop = document.getElementById('btnStartStop');
+const btnStartStop = document.getElementById('btnStartStop'); //TODO REMOVE
 const divDevices = document.getElementById('divDevices');
 
-//scan for available devices
-const scanningTask = setInterval(GetAvailableDevices, deviceDiscoveryRefreshRateMs);
-
-var devices = []
-
 //start scanning for devices
+const scanningTask = null;
 try{
-    StartScanning();
+    //scan for available devices
+    scanningTask = StartScanning();
+    backendReachable = true;
 }
 catch (error) {
+    //stop scanning
+    StopScanning(scanningTask);
+    
     console.error('Message', 'Ensure that the backend server is running.')
     console.error('Error:', error);
 }
 
+//show error message if backend not found
+if(!backendReachable) {
+    var divError = document.createElement('divError');
+    divError.className = 'errorMessage';
+    const p = document.createElement('p');
+    p.textContent = 'Backend not reachable';
+    divError.appendChild(p);
+    divDevices.appendChild(divError);
+}
+
+//TODO REMOVE
 btnStartStop.addEventListener('click', () => {
     StartScanning();
 });
 
-async function GetAvailableDevices() {
-    var res = await SendAPIRequest(apiGetAvailableDevices);
-    if (!(JSON.stringify(devices) === JSON.stringify(res.devices))) {
-        devices = res.devices;
-        console.log(devices);
-        devices.forEach(deviceName => {
-            var divDevice = document.createElement('divDevice');
-            divDevice.className = 'device';
-            const p = document.createElement('p');
-            p.textContent = deviceName;
-            divDevice.appendChild(p);
-            divDevices.appendChild(divDevice);
-        });
-    }
+async function Open(deviceName){
+    StopScanning()
+
 }
 
 async function StartScanning() {
+    isScanning = true;
     console.log(await SendAPIRequest(apiStartScanning));
+    scanningTask = setInterval(GetAvailableDevices, deviceDiscoveryRefreshRateMs);
+    return scanningTask;
 }
 
-async function StopScanning() {
-    console.log(await SendAPIRequest(apiStopScanning));
+async function StopScanning(scanningTask) {
+    if(scanningTask != null)
+        clearInterval(scanningTask);
+    if(isScanning){
+        console.log(await SendAPIRequest(apiStopScanning));
+        isScanning = false;
+    }
+}
+
+async function GetAvailableDevices() {
+    var res = await SendAPIRequest(apiGetAvailableDevices);
+    if(res != null)
+    {
+        if (!(JSON.stringify(devices) === JSON.stringify(res.devices))) {
+            devices = res.devices;
+            console.log(devices);
+            devices.forEach(deviceName => {
+                var divDevice = document.createElement('divDevice');
+                divDevice.className = 'device';
+                const p = document.createElement('p');
+                p.textContent = deviceName;
+                divDevice.appendChild(p);
+                divDevice.addEventListener('click', () => {
+                    //TODO CALL OPEN
+                })
+                divDevices.appendChild(divDevice);
+            });
+        }
+    } 
 }
 
 async function SendAPIRequest(command) {
-    try {
-        const response = await fetch(apiPath, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ cmd: command })
-        });
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error:', error);
-    }
+    const response = await fetch(apiPath, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ cmd: command })
+    });
+    const data = await response.json();
+    return data;
 }
