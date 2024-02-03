@@ -1,6 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket
 from daq_simulator import DAQSimulator
-import json
 
 apiStartScanning = 'StartScanning'
 apiStopScanning = 'StopScanning'
@@ -33,3 +32,11 @@ async def create_item(item_data: dict):
     else:
         raise HTTPException(status_code=400, detail="Unknown api command")
     return res
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        #TODO SEND DATA HERE
+        data = await websocket.receive_text() #TODO REMOVE
+        await websocket.send_text(f"Message text was: {data}") #TODO REMOVE

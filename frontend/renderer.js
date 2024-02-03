@@ -1,6 +1,9 @@
 const WebSocket = require('ws');
 
 //API functions
+
+const wsPath = 'ws://localhost:5832/ws' // TODO PUT INTO .env
+const ws = new WebSocket(wsPath); //TODO AFTER OPEN
 const apiPath = 'http://localhost:5832/api/' // TODO PUT INTO .env
 const apiStartScanning = 'StartScanning';
 const apiStopScanning = 'StopScanning';
@@ -13,12 +16,12 @@ const deviceDiscoveryRefreshRateMs = 500;
 var devices = []
 var isScanning = false;
 var backendReachable = false;
+
 //UI elements
-const btnStartStop = document.getElementById('btnStartStop'); //TODO REMOVE
 const divDevices = document.getElementById('divDevices');
 
 //start scanning for devices
-const scanningTask = null;
+var scanningTask = null;
 try{
     //scan for available devices
     scanningTask = StartScanning();
@@ -41,11 +44,6 @@ if(!backendReachable) {
     divError.appendChild(p);
     divDevices.appendChild(divError);
 }
-
-//TODO REMOVE
-btnStartStop.addEventListener('click', () => {
-    StartScanning();
-});
 
 async function Open(deviceName){
     StopScanning()
@@ -81,8 +79,9 @@ async function GetAvailableDevices() {
                 const p = document.createElement('p');
                 p.textContent = deviceName;
                 divDevice.appendChild(p);
-                divDevice.addEventListener('click', () => {
+                divDevice.addEventListener('click', function(event) {
                     //TODO CALL OPEN
+                    console.log('div text:', event.target.innerText);
                 })
                 divDevices.appendChild(divDevice);
             });
