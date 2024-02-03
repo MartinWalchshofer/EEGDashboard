@@ -2,20 +2,24 @@ const WebSocket = require('ws');
 
 //API functions
 
-const wsPath = 'ws://localhost:5832/ws' // TODO PUT INTO .env
-const ws = new WebSocket(wsPath); //TODO AFTER OPEN
-const apiPath = 'http://localhost:5832/api/' // TODO PUT INTO .env
+const serverPath = 'localhost';     // TODO PUT INTO .env
+const communicationPort = '5832';   // TODO PUT INTO .env
+const apiPath = '/api/';            // TODO PUT INTO .env
+const wsPath = '/ws';               // TODO PUT INTO .env
+const fullWsPath = 'ws://' + serverPath + ':' + communicationPort + wsPath; 
+const fullApiPath = 'http://' + serverPath + ':' + communicationPort + apiPath;
 const apiStartScanning = 'StartScanning';
 const apiStopScanning = 'StopScanning';
 const apiGetAvailableDevices = 'GetAvailableDevices';
-const apiOpen = 'Open'
-const apiClose = 'Close'
+const apiOpen = 'Open';             //TODO
+const apiClose = 'Close';           //TODO
 const deviceDiscoveryRefreshRateMs = 500;
 
 //variables
-var devices = []
+var devices = [];
 var isScanning = false;
 var backendReachable = false;
+var dataSocket = null;
 
 //UI elements
 const divDevices = document.getElementById('divDevices');
@@ -24,8 +28,19 @@ const divDevices = document.getElementById('divDevices');
 var scanningTask = null;
 try{
     //scan for available devices
-    scanningTask = StartScanning();
-    backendReachable = true;
+    scanningTask = StartScanning().then(() => {
+        backendReachable = true;
+
+    //show error message if backend not found
+    if(!backendReachable) {
+        var divError = document.createElement('divError');
+        divError.className = 'errorMessage';
+        const p = document.createElement('p');
+        p.textContent = 'Backend not reachable';
+        divError.appendChild(p);
+        divDevices.appendChild(divError);
+    }
+    });
 }
 catch (error) {
     //stop scanning
@@ -35,25 +50,22 @@ catch (error) {
     console.error('Error:', error);
 }
 
-//show error message if backend not found
-if(!backendReachable) {
-    var divError = document.createElement('divError');
-    divError.className = 'errorMessage';
-    const p = document.createElement('p');
-    p.textContent = 'Backend not reachable';
-    divError.appendChild(p);
-    divDevices.appendChild(divError);
-}
-
 async function Open(deviceName){
-    StopScanning()
+    await StopScanning();
 
+    console.log(deviceName); // TODO REMOVE
+    //Open device
+    await console.log(await SendAPIRequest(apiOpen, deviceName));
+
+    //attach to websocket
+    if(dataSocket == null)
+        dataSocket = new WebSocket(fullWsPath);
 }
 
-async function StartScanning() {
-    isScanning = true;
-    console.log(await SendAPIRequest(apiStartScanning));
+async function StartScanning() { 
+    console.log(await SendAPIRequest(apiStartScanning, null));
     scanningTask = setInterval(GetAvailableDevices, deviceDiscoveryRefreshRateMs);
+    isScanning = true;
     return scanningTask;
 }
 
@@ -61,13 +73,13 @@ async function StopScanning(scanningTask) {
     if(scanningTask != null)
         clearInterval(scanningTask);
     if(isScanning){
-        console.log(await SendAPIRequest(apiStopScanning));
+        console.log(await SendAPIRequest(apiStopScanning, null));
         isScanning = false;
     }
 }
 
 async function GetAvailableDevices() {
-    var res = await SendAPIRequest(apiGetAvailableDevices);
+    var res = await SendAPIRequest(apiGetAvailableDevices, null);
     if(res != null)
     {
         if (!(JSON.stringify(devices) === JSON.stringify(res.devices))) {
@@ -80,8 +92,7 @@ async function GetAvailableDevices() {
                 p.textContent = deviceName;
                 divDevice.appendChild(p);
                 divDevice.addEventListener('click', function(event) {
-                    //TODO CALL OPEN
-                    console.log('div text:', event.target.innerText);
+                    Open(event.target.innerText)
                 })
                 divDevices.appendChild(divDevice);
             });
@@ -89,13 +100,18 @@ async function GetAvailableDevices() {
     } 
 }
 
-async function SendAPIRequest(command) {
-    const response = await fetch(apiPath, {
+async function SendAPIRequest(command, arguments) {
+    var jsCmd;
+    if(arguments != null)
+        jsCmd = JSON.stringify({ cmd: command }, {args: arguments});
+    else
+        jsCmd = JSON.stringify({ cmd: command });
+    const response = await fetch(fullApiPath, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ cmd: command })
+            body: jsCmd
     });
     const data = await response.json();
     return data;
