@@ -73,8 +73,9 @@ async function Open(deviceName){
         
         dataSocket.on('message', function(data) {
             jsonString = JSON.parse(data);
-            console.log(jsonString);
-            
+            const numberArray = JSON.parse(jsonString.substring(jsonString.indexOf('['), jsonString.lastIndexOf(']') + 1));
+            console.log(numberArray);
+            //TODO FIFO IN
         });
         
         dataSocket.on('error', function(error) {

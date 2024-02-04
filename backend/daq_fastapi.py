@@ -16,7 +16,7 @@ rawDataFifoS = 10
 app = FastAPI() 
 device = None
 acquisitionRunning = False
-debugMessages = True
+debugMessages = False
 rawDataQueue = queue.Queue(samplingRate * rawDataFifoS)
 
 discovered_devices = []
