@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException, WebSocket
 from daq_simulator import DAQSimulator
+import queue
+import json
 
 apiStartScanning = 'StartScanning'
 apiStopScanning = 'StopScanning'
@@ -9,9 +11,13 @@ apiClose = 'Close'
 
 samplingRate = 250
 numberOfChannels = 8
+rawDataFifoS = 10
 
-app = FastAPI()
+app = FastAPI() 
 device = None
+acquisitionRunning = False
+debugMessages = True
+rawDataQueue = queue.Queue(samplingRate * rawDataFifoS)
 
 discovered_devices = []
 def on_devices_discovered(devices):
@@ -19,12 +25,17 @@ def on_devices_discovered(devices):
     discovered_devices = devices
 
 def on_data_available(data):
-    print(data) #Write to buffer
+    rawDataQueue.put(data)
 
 #start with 'uvicorn daq_fastapi:app --port 5832'
 @app.post("/api/")
 async def create_item(item_data: dict):
+    global device
+    global acquisitionRunning
+    global debugMessages
     command = item_data.get('cmd')
+    if debugMessages:
+        print(command)
     res = []
     if command == apiStartScanning:
         DAQSimulator.add_devices_discovered_eventhandler(on_devices_discovered)
@@ -42,20 +53,27 @@ async def create_item(item_data: dict):
             raise HTTPException(status_code=400, detail= deviceName + 'not found.')
         device = DAQSimulator(deviceName, samplingRate, numberOfChannels)
         res = {"msg": 'Connected to' + deviceName}
+        acquisitionRunning = True
         device.add_data_available_eventhandler(on_data_available)
     elif command == apiClose:
-        device.remove_data_available_eventhandler(on_data_available)
-        del device
-        device = None
+        acquisitionRunning = False
+        if device is not None:
+            device.remove_devices_discovered_eventhandler(on_data_available)
+            del device
+            device = None
     else:
         raise HTTPException(status_code=400, detail="Unknown api command")
+    if debugMessages:
+        print(res)
     return res
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    while True:
-        #TODO READ FROM BUFFER AND SEND
-        #TODO SEND DATA HERE
-        data = await websocket.receive_text() #TODO REMOVE
-        await websocket.send_text(f"Message text was: {data}") #TODO REMOVE
+    while acquisitionRunning:
+        while not rawDataQueue.empty():
+            if debugMessages:
+                print(json.dumps(f"sample: {rawDataQueue.get()}"))
+            await websocket.send_text(json.dumps(f"sample: {rawDataQueue.get()}"))
+        #data = await websocket.receive_text() #TODO REMOVE
+        

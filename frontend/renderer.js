@@ -1,7 +1,6 @@
 const WebSocket = require('ws');
 
 //API functions
-
 const serverPath = 'localhost';     // TODO PUT INTO .env
 const communicationPort = '5832';   // TODO PUT INTO .env
 const apiPath = '/api/';            // TODO PUT INTO .env
@@ -25,10 +24,8 @@ var dataSocket = null;
 const divDevices = document.getElementById('divDevices');
 const dlgDevices = document.getElementById('dlgDevices');
 const dlgMain = document.getElementById('dlgMain');
-//document.querySelector("dlgDevices").style.display = "none";
-//document.querySelector("dlgMain").style.display = "block";
 
-//TODO PUT INTO OWN FUNCTION
+//TODO: CREATE SWITCH DIALOG FUNCTION
 dlgMain.style.display = 'none';
 dlgDevices.style.display = 'block';
 
@@ -67,16 +64,36 @@ async function Open(deviceName){
 
     //attach to websocket
     if(dataSocket == null)
+    {
         dataSocket = new WebSocket(fullWsPath);
 
-    //TODO PUT INTO OWN FUNCTION
+        dataSocket.on('open', function() {
+            console.log('WebSocket connection established.');
+        });
+        
+        dataSocket.on('message', function(data) {
+            jsonString = JSON.parse(data);
+            console.log(jsonString);
+            
+        });
+        
+        dataSocket.on('error', function(error) {
+            console.error('WebSocket error:', error);
+        });
+        
+        dataSocket.on('close', function() {
+            console.log('WebSocket connection closed.');
+        });
+    }
+        
+    //TODO: CREATE SWITCH DIALOG FUNCTION
     dlgDevices.style.display = 'none';
     dlgMain.style.display = 'block';
 }
 
 async function Close()
 {
-    
+    //TODO
 }
 
 async function StartScanning() { 
