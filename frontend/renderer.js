@@ -141,17 +141,17 @@ function InitializeTimeSeriesPlot() {
     try {
         //get html element
         const appDiv = document.getElementById('plotTimeSeries');
-        appDiv.style.minWidth = '400px'; //TODO
-        appDiv.style.height = '300px'; //TODO
+        appDiv.style.minWidth = '800px'; //TODO
+        appDiv.style.height = '600px'; //TODO
 
-        var xData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; //TODO 
+        var xData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; //TODO 
         var traces = [];
         for(var i = 0; i < 8; i++)
         {
             trace = {
                 type: 'scatter',
                 x: xData,
-                y: [12,4,3,2,3,4,6,3,10,8], //TODO 
+                y: [50 + i*50 - 4*50,-50+ i*50- 4*50,50+ i*50- 4*50,-50+ i*50- 4*50,3+ i*50- 4*50,4+ i*50- 4*50,6+ i*50- 4*50,3+ i*50- 4*50,10+ i*50- 4*50,8+ i*50- 4*50], //TODO 
                 mode: 'lines',
                 name: 'trace ' + i+1,
                 line: {
@@ -164,11 +164,22 @@ function InitializeTimeSeriesPlot() {
 
         var layout = {
             title: 'EEG',
-            xaxis: {title: 't [s]'},
-            yaxis: {title: 'A [µV]'},
+            xaxis: {
+                title: 't [s]', 
+                showgrid: true,
+                },
+            yaxis: {
+                range: [-50 * 4, 50 * 4], //TOOD
+                showline: false, 
+                showticklabels: false,
+                showgrid: false,
+                zeroline: false,
+                },
             hovermode: false,
             dragmode: false ,
             showlegend: false,
+            margin: 0,
+            padding: 0,
         };
 
         var config = {displayModeBar: false};
