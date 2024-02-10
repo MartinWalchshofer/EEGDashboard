@@ -1,5 +1,4 @@
 const MultiChannelOverridingBuffer = require('./multichannel_overriding_buffer')
-const MatrixOperations = require('./martix_operations')
 
 class TimeseriesPlot {
     #buffer;
@@ -18,7 +17,7 @@ class TimeseriesPlot {
             this.#xdata[i] = i/samplingRate;
         }
 
-        let data = MatrixOperations.transpose(this.#buffer.getData());
+        let data = this.#buffer.getData();
         if(data.length !== numberOfChannels) {
             throw new Error("Dimensions do not fit.");
         }
@@ -78,7 +77,7 @@ class TimeseriesPlot {
 
     update()
     {
-        let data = MatrixOperations.transpose(this.#buffer.getData());
+        let data = this.#buffer.getData();
         let update = {
             y: data
         };

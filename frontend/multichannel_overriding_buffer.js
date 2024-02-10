@@ -6,8 +6,8 @@ class MultiChannelOverridingBuffer {
     {
         this.#data = [];
         this.#cnt = 0;
-        var rows = samplingRate * timeS;
-        var cols = numberOfChannels;
+        var rows = numberOfChannels;
+        var cols = samplingRate * timeS;
         for (let i = 0; i < rows; i++) {
             this.#data[i] = [];
             for (let j = 0; j < cols; j++) {
@@ -18,10 +18,13 @@ class MultiChannelOverridingBuffer {
 
     setData(data)
     {
-        this.#data[this.#cnt]=data.slice();
+        for(let i = 0; i < data.length; i++)
+        {
+            this.#data[i][this.#cnt] = data[i];
+        }
         this.#cnt++;
 
-        if(this.#cnt >= this.#data.length)
+        if(this.#cnt >= this.#data.length[0])
             this.#cnt = 0;
     }
 
