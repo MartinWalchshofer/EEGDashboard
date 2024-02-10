@@ -1,3 +1,4 @@
+const TimeseriesPlot = require('./timeseries_plot')
 const WebSocket = require('ws');
 
 //API functions
@@ -12,6 +13,7 @@ const apiStopScanning = 'StopScanning';
 const apiGetAvailableDevices = 'GetAvailableDevices';
 const apiOpen = 'Open';
 const apiClose = 'Close';           //TODO
+const apiGetAmplifierConfiguration = 'GetAmplifierConfiguration'; // TODO number of channels/sampling rate
 const deviceDiscoveryRefreshRateMs = 500;
 
 //variables
@@ -19,11 +21,14 @@ var devices = [];
 var isScanning = false;
 var backendReachable = false;
 var dataSocket = null;
-
+var tsPlot = null;
+var sampleCnt;
 //UI elements
 const divDevices = document.getElementById('divDevices');
 const dlgDevices = document.getElementById('dlgDevices');
 const dlgMain = document.getElementById('dlgMain');
+
+const divTsPlot = document.getElementById('plotTimeSeries');
 
 //TODO: CREATE SWITCH DIALOG FUNCTION
 dlgMain.style.display = 'none';
@@ -74,8 +79,23 @@ async function Open(deviceName){
         dataSocket.on('message', function(data) {
             jsonString = JSON.parse(data);
             const numberArray = JSON.parse(jsonString.substring(jsonString.indexOf('['), jsonString.lastIndexOf(']') + 1));
-            console.log(numberArray);
-            //TODO FIFO IN
+            //console.log(numberArray);
+
+            //initialize plot
+            if(tsPlot == null)
+            {
+                tsPlot = new TimeseriesPlot(numberArray.length, 250, 10, divTsPlot);
+                sampleCnt = 0;
+            }
+                
+            //write data to plot
+            tsPlot.setData(numberArray);
+
+            sampleCnt++;
+            if(sampleCnt % 10 == 0)
+            {
+                tsPlot.update();
+            }
         });
         
         dataSocket.on('error', function(error) {
@@ -90,8 +110,6 @@ async function Open(deviceName){
     //TODO: CREATE SWITCH DIALOG FUNCTION
     dlgDevices.style.display = 'none';
     dlgMain.style.display = 'block';
-
-    InitializeTimeSeriesPlot();
 }
 
 async function Close()
@@ -134,79 +152,6 @@ async function GetAvailableDevices() {
             });
         }
     } 
-}
-
-//TODO NOT FINISHED YET
-function InitializeTimeSeriesPlot() {
-    try {
-        //get html element
-        const appDiv = document.getElementById('plotTimeSeries');
-        appDiv.style.minWidth = '800px'; //TODO
-        appDiv.style.height = '600px'; //TODO
-
-        var xData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; //TODO 
-        var traces = [];
-        for(var i = 0; i < 8; i++)
-        {
-            trace = {
-                type: 'scatter',
-                x: xData,
-                y: [50 + i*50 - 4*50,-50+ i*50- 4*50,50+ i*50- 4*50,-50+ i*50- 4*50,3+ i*50- 4*50,4+ i*50- 4*50,6+ i*50- 4*50,3+ i*50- 4*50,10+ i*50- 4*50,8+ i*50- 4*50], //TODO 
-                mode: 'lines',
-                name: 'trace ' + i+1,
-                line: {
-                  color: 'rgb(55, 128, 191)',
-                  width: 1
-                }
-              };
-            traces.push(trace);
-        }
-
-        var layout = {
-            title: 'EEG',
-            xaxis: {
-                title: 't [s]', 
-                showgrid: true,
-                },
-            yaxis: {
-                range: [-50 * 4, 50 * 4], //TOOD
-                showline: false, 
-                showticklabels: false,
-                showgrid: false,
-                zeroline: false,
-                },
-            hovermode: false,
-            dragmode: false ,
-            showlegend: false,
-            margin: 0,
-            padding: 0,
-        };
-
-        var config = {displayModeBar: false};
-        //appDiv.innerHTML = `<div style="width: 100px; height: 100px" id="chart"></div>`;
-
-        //initialize plot data
-        /*for(var i = 0; i < ydata.length; i++) {
-            ydata[i] = 0;
-        }*/
-
-        //initialize plot
-        Plotly.newPlot('plotTimeSeries', traces, layout, config);
-        /*Plotly.newPlot('plotTimeSeries', [{
-        y: [1, 2, 3, 4], //TODO
-        yaxis: {
-            autorange: false,
-            range: [-0.5, 0.5],
-            type: 'linear'
-          },
-        mode: 'lines',
-        line: {color: '#063970'},
-        }]);*/
-        
-    }
-    catch {
-
-    }  
 }
 
 async function SendAPIRequest(command, arguments) {
