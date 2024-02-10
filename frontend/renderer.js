@@ -20,8 +20,6 @@ var isScanning = false;
 var backendReachable = false;
 var dataSocket = null;
 
-InitializeTimeSeriesPlot() //TODO
-
 //UI elements
 const divDevices = document.getElementById('divDevices');
 const dlgDevices = document.getElementById('dlgDevices');
@@ -143,8 +141,37 @@ function InitializeTimeSeriesPlot() {
     try {
         //get html element
         const appDiv = document.getElementById('plotTimeSeries');
-        appDiv.style.width = '100px'; //TODO
-        appDiv.style.height = '200px'; //TODO
+        appDiv.style.minWidth = '400px'; //TODO
+        appDiv.style.height = '300px'; //TODO
+
+        var xData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; //TODO 
+        var traces = [];
+        for(var i = 0; i < 8; i++)
+        {
+            trace = {
+                type: 'scatter',
+                x: xData,
+                y: [12,4,3,2,3,4,6,3,10,8], //TODO 
+                mode: 'lines',
+                name: 'trace ' + i+1,
+                line: {
+                  color: 'rgb(55, 128, 191)',
+                  width: 1
+                }
+              };
+            traces.push(trace);
+        }
+
+        var layout = {
+            title: 'EEG',
+            xaxis: {title: 't [s]'},
+            yaxis: {title: 'A [µV]'},
+            hovermode: false,
+            dragmode: false ,
+            showlegend: false,
+        };
+
+        var config = {displayModeBar: false};
         //appDiv.innerHTML = `<div style="width: 100px; height: 100px" id="chart"></div>`;
 
         //initialize plot data
@@ -153,8 +180,9 @@ function InitializeTimeSeriesPlot() {
         }*/
 
         //initialize plot
-        Plotly.newPlot('plotTimeSeries', [{
-        y: ydata, //TODO
+        Plotly.newPlot('plotTimeSeries', traces, layout, config);
+        /*Plotly.newPlot('plotTimeSeries', [{
+        y: [1, 2, 3, 4], //TODO
         yaxis: {
             autorange: false,
             range: [-0.5, 0.5],
@@ -162,7 +190,7 @@ function InitializeTimeSeriesPlot() {
           },
         mode: 'lines',
         line: {color: '#063970'},
-        }]);
+        }]);*/
         
     }
     catch {
