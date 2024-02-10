@@ -16,6 +16,10 @@ const apiClose = 'Close';           //TODO
 const apiGetAmplifierConfiguration = 'GetAmplifierConfiguration'; // TODO number of channels/sampling rate
 const deviceDiscoveryRefreshRateMs = 500;
 
+const samplingRate = 250;
+const displayedTimeS = 10;
+const refreshRateHz = 25;
+
 //variables
 var devices = [];
 var isScanning = false;
@@ -84,7 +88,7 @@ async function Open(deviceName){
             //initialize plot
             if(tsPlot == null)
             {
-                tsPlot = new TimeseriesPlot(numberArray.length, 250, 10, divTsPlot);
+                tsPlot = new TimeseriesPlot(numberArray.length, samplingRate, displayedTimeS, divTsPlot);
                 sampleCnt = 0;
             }
                 
@@ -92,7 +96,7 @@ async function Open(deviceName){
             tsPlot.setData(numberArray);
 
             sampleCnt++;
-            if(sampleCnt % 10 == 0)
+            if(sampleCnt % Math.round(samplingRate/refreshRateHz) == 0)
             {
                 tsPlot.update();
             }

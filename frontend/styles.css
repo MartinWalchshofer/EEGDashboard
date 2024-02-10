@@ -41,3 +41,8 @@ body, html {
 .prtTop, .prtBottom {
     margin: 20px 0; 
 }
+
+.plotTimeSeries {
+    width: 1200px;
+    height: 800px;
+}

@@ -4,11 +4,39 @@ class TimeseriesPlot {
     #buffer;
     #xdata;
     #divTag;
+    #range;
+    #offsets;
+    #numberOfChannels;
     constructor(numberOfChannels, samplingRate, displayedTimeS, divTag)
     {
+        let amplitude = 200;
         this.#divTag = divTag;
+        this.#numberOfChannels = numberOfChannels;
         this.#buffer = new MultiChannelOverridingBuffer(numberOfChannels, samplingRate, displayedTimeS);
         this.#InitializeTimeSeriesPlot(numberOfChannels, samplingRate, displayedTimeS, this.#divTag );
+        this.#range = new Array(2);
+        if(numberOfChannels % 2 === 0)
+        {
+            this.#range[0] = -amplitude * numberOfChannels/2;
+            this.#range[1] = amplitude * numberOfChannels/2;
+        }
+        else
+        {
+            this.#range[0] = -amplitude * (numberOfChannels-1)/2;
+            this.#range[1] = amplitude * (numberOfChannels-1)/2;
+        }    
+        this.#offsets = new Array(numberOfChannels);
+        for(let i = 0; i < numberOfChannels;i++)
+        {
+            if(numberOfChannels % 2 === 0)
+            {
+                this.#offsets[i] = amplitude * (numberOfChannels/2) - amplitude/2 - i * amplitude;
+            }
+            else
+            {
+                this.#offsets[i] = amplitude * ((numberOfChannels/2)-0.5)- i * amplitude;
+            }
+        }
     }
 
     #InitializeTimeSeriesPlot(numberOfChannels, samplingRate, displayedTimeS, divTag) {
@@ -32,7 +60,7 @@ class TimeseriesPlot {
                 mode: 'lines',
                 name: 'trace ' + i+1,
                 line: {
-                  color: 'rgb(55, 128, 191)',
+                  color: 'rgb(255, 255, 255)',
                   width: 1
                 }
               };
@@ -48,7 +76,7 @@ class TimeseriesPlot {
                 }
                 },
             yaxis: {
-                range: [-50, 50], //TOOD
+                range: this.#range,
                 showline: false, 
                 showticklabels: false,
                 showgrid: false,
@@ -72,6 +100,12 @@ class TimeseriesPlot {
     setData(data)
     {
         //TODO CHECK DIMENSIONS
+
+        for(let i = 0; i < this.#numberOfChannels; i++)
+        {
+            data[i] = data[i]+this.#offsets[i];
+        }
+
         this.#buffer.setData(data);
     }
 
