@@ -75,5 +75,6 @@ async def websocket_endpoint(websocket: WebSocket):
             if debugMessages:
                 print(json.dumps(f"sample: {rawDataQueue.get()}"))
             await websocket.send_text(json.dumps(f"sample: {rawDataQueue.get()}"))
+    #TODO CHECK IF JAVASCRIPT SIDE IS FAST ENOUGH BUFFER MULTIPLE SAMPLES AND SEND WITH ONE PACKAGE OTHERWISE
         #data = await websocket.receive_text() #TODO REMOVE
         

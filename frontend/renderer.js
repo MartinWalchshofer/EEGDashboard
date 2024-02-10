@@ -20,6 +20,8 @@ var isScanning = false;
 var backendReachable = false;
 var dataSocket = null;
 
+InitializeTimeSeriesPlot() //TODO
+
 //UI elements
 const divDevices = document.getElementById('divDevices');
 const dlgDevices = document.getElementById('dlgDevices');
@@ -90,6 +92,8 @@ async function Open(deviceName){
     //TODO: CREATE SWITCH DIALOG FUNCTION
     dlgDevices.style.display = 'none';
     dlgMain.style.display = 'block';
+
+    InitializeTimeSeriesPlot();
 }
 
 async function Close()
@@ -132,6 +136,38 @@ async function GetAvailableDevices() {
             });
         }
     } 
+}
+
+//TODO NOT FINISHED YET
+function InitializeTimeSeriesPlot() {
+    try {
+        //get html element
+        const appDiv = document.getElementById('plotTimeSeries');
+        appDiv.style.width = '100px'; //TODO
+        appDiv.style.height = '200px'; //TODO
+        //appDiv.innerHTML = `<div style="width: 100px; height: 100px" id="chart"></div>`;
+
+        //initialize plot data
+        /*for(var i = 0; i < ydata.length; i++) {
+            ydata[i] = 0;
+        }*/
+
+        //initialize plot
+        Plotly.newPlot('plotTimeSeries', [{
+        y: ydata, //TODO
+        yaxis: {
+            autorange: false,
+            range: [-0.5, 0.5],
+            type: 'linear'
+          },
+        mode: 'lines',
+        line: {color: '#063970'},
+        }]);
+        
+    }
+    catch {
+
+    }  
 }
 
 async function SendAPIRequest(command, arguments) {
