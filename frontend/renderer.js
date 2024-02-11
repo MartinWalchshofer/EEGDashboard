@@ -8,17 +8,15 @@ const apiPath = '/api/';            // TODO PUT INTO .env
 const wsPath = '/ws';               // TODO PUT INTO .env
 const fullWsPath = 'ws://' + serverPath + ':' + communicationPort + wsPath; 
 const fullApiPath = 'http://' + serverPath + ':' + communicationPort + apiPath;
-const apiStartScanning = 'StartScanning';
-const apiStopScanning = 'StopScanning';
-const apiGetAvailableDevices = 'GetAvailableDevices';
-const apiOpen = 'Open';
-const apiClose = 'Close';           //TODO
-const apiGetAmplifierConfiguration = 'GetAmplifierConfiguration'; // TODO number of channels/sampling rate
+const apiStartScanning = 'StartScanning'; //TODO LOAD FROM .env or json
+const apiStopScanning = 'StopScanning'; //TODO LOAD FROM .env or json
+const apiGetAvailableDevices = 'GetAvailableDevices';//TODO LOAD FROM .env or json
+const apiOpen = 'Open'; //TODO LOAD FROM .env or json
+const apiClose = 'Close'; //TODO LOAD FROM .env or json
 const deviceDiscoveryRefreshRateMs = 500;
 
-const samplingRate = 250;
-const displayedTimeS = 10;
 const refreshRateHz = 25;
+const displayedTimeS = 10;
 
 //variables
 var devices = [];
@@ -27,6 +25,9 @@ var backendReachable = false;
 var dataSocket = null;
 var tsPlot = null;
 var sampleCnt;
+var samplingRate = 0;
+var numberOfChannels = 0;
+
 //UI elements
 const divDevices = document.getElementById('divDevices');
 const dlgDevices = document.getElementById('dlgDevices');
@@ -69,7 +70,12 @@ async function Open(deviceName){
 
     console.log(deviceName); // TODO REMOVE
     //Open device
-    await console.log(await SendAPIRequest(apiOpen, deviceName));
+    let res = await SendAPIRequest(apiOpen, deviceName);
+    samplingRate = parseInt(res.samplingRate);
+    numberOfChannels = parseInt(res.numberOfChannels);
+
+    if(samplingRate === 0 || numberOfChannels === 0)
+        throw new Error('Could not read amplifier configuration')
 
     //attach to websocket
     if(dataSocket == null)
@@ -88,7 +94,7 @@ async function Open(deviceName){
             //initialize plot
             if(tsPlot == null)
             {
-                tsPlot = new TimeseriesPlot(numberArray.length, samplingRate, displayedTimeS, divTsPlot);
+                tsPlot = new TimeseriesPlot(numberOfChannels, samplingRate, displayedTimeS, divTsPlot);
                 sampleCnt = 0;
             }
                 

@@ -9,7 +9,7 @@ class TimeseriesPlot {
     #numberOfChannels;
     constructor(numberOfChannels, samplingRate, displayedTimeS, divTag)
     {
-        let amplitude = 200;
+        let amplitude = 100;
         this.#divTag = divTag;
         this.#numberOfChannels = numberOfChannels;
         this.#buffer = new MultiChannelOverridingBuffer(numberOfChannels, samplingRate, displayedTimeS);

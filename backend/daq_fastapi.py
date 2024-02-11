@@ -3,6 +3,8 @@ from daq_simulator import DAQSimulator
 import queue
 import json
 
+#start with 'uvicorn daq_fastapi:app --port 5832'
+
 apiStartScanning = 'StartScanning'
 apiStopScanning = 'StopScanning'
 apiGetAvailableDevices = 'GetAvailableDevices'
@@ -27,12 +29,14 @@ def on_devices_discovered(devices):
 def on_data_available(data):
     rawDataQueue.put(data)
 
-#start with 'uvicorn daq_fastapi:app --port 5832'
+
 @app.post("/api/")
 async def create_item(item_data: dict):
     global device
     global acquisitionRunning
     global debugMessages
+    global samplingRate
+    global numberOfChannels
     command = item_data.get('cmd')
     if debugMessages:
         print(command)
@@ -52,13 +56,15 @@ async def create_item(item_data: dict):
         if deviceName not in discovered_devices:
             raise HTTPException(status_code=400, detail= deviceName + 'not found.')
         device = DAQSimulator(deviceName, samplingRate, numberOfChannels)
-        res = {"msg": 'Connected to' + deviceName}
+        res = {'samplingRate': samplingRate, 
+               'numberOfChannels': numberOfChannels,
+               'msg': 'Connected to ' + deviceName}
         acquisitionRunning = True
         device.add_data_available_eventhandler(on_data_available)
     elif command == apiClose:
         acquisitionRunning = False
         if device is not None:
-            device.remove_devices_discovered_eventhandler(on_data_available)
+            device.remove_data_available_eventhandler(on_data_available)
             del device
             device = None
     else:

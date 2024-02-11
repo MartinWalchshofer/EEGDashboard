@@ -59,7 +59,7 @@ class DAQSimulator:
             time.sleep(1/self.sampling_rate)
             data = [0]*self.channel_count
             for i in range(self.channel_count):
-                data[i] = random.uniform(-50, 50)
+                data[i] = random.uniform(-10, 10)
             for handler in self.__eventHandlers:
                 handler(data)
 
