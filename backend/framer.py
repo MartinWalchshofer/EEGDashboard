@@ -4,7 +4,7 @@ class Framer:
     __frame = None
     __frameOut = None
     __cnt = 0
-    def __init__(self, channel_count, samples_count):
+    def __init__(self, samples_count, channel_count):
         self.__frame = np.zeros((samples_count, channel_count))
         self.__frameOut = np.zeros((samples_count, channel_count))
         self.__cnt = 0
@@ -16,16 +16,14 @@ class Framer:
         if isinstance(data, np.ndarray):
             if data.shape[1] is not self.__frame.shape[1]:
                 raise ValueError("Dimensions do not match.")
-            for i in range(0, data.shape[1]):
-                self.__frame[self.__cnt, i] = data[0, i]
-            self.__cnt = self.__cnt + 1
-            if self.__cnt >= self.__frame.shape[0]:
-                self.__cnt = 0
+            for sample in range(0, data.shape[0]):
+                for channel in range(0, data.shape[1]):
+                    self.__frame[self.__cnt, channel] = data[sample, channel]
+                self.__cnt = self.__cnt + 1
+                if self.__cnt >= self.__frame.shape[0]:
+                    self.__cnt = 0
         else:
             raise TypeError("Type not supported.")
         
     def getFrame(self):
-        return None # todo copy in correct order
-
-
-        
+        return np.concatenate((self.__frame[self.__cnt :], self.__frame[:self.__cnt ]), axis=0)

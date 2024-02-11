@@ -19,7 +19,7 @@ fftWindowSizeS = 4
 
 app = FastAPI() 
 device = None
-fftFramer = Framer(numberOfChannels, samplingRate * fftWindowSizeS)
+fftFramer = Framer(samplingRate * fftWindowSizeS, numberOfChannels)
 acquisitionRunning = False
 debugMessages = False
 rawDataQueue = queue.Queue(samplingRate * rawDataFifoS)
@@ -32,6 +32,7 @@ def on_devices_discovered(devices):
 def on_data_available(data):
     fftFramer.setData(data)
     rawDataQueue.put(data)  
+    frame = fftFramer.getFrame()
 
 @app.post("/api/")
 async def create_item(item_data: dict):
@@ -86,4 +87,3 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send_text(json.dumps(f"sample: {rawDataQueue.get()}"))
     #TODO CHECK IF JAVASCRIPT SIDE IS FAST ENOUGH BUFFER MULTIPLE SAMPLES AND SEND WITH ONE PACKAGE OTHERWISE
     #data = await websocket.receive_text() #TODO REMOVE
-        
