@@ -21,7 +21,7 @@ const createWindow = () => {
   mainWindow.loadFile('index.html')
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools() //TODO REMOVE IN THE END
+  //mainWindow.webContents.openDevTools() //TODO REMOVE IN THE END
 }
 
 // This method will be called when Electron has finished

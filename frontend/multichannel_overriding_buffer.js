@@ -23,12 +23,10 @@ class MultiChannelOverridingBuffer {
             this.#data[i][this.#cnt] = data[i];
         }
         this.#cnt++;
-
-        console.log('[' + this.#cnt + '/' + this.#data[0].length, ']')
+        
         if(this.#cnt >= this.#data[0].length)
         {
             this.#cnt = 0;
-            console.log("reset")
         }         
     }
 

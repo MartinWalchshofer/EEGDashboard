@@ -14,22 +14,36 @@
     
   </head>
   <body>
-    <div id="dlgDevices" class="dlg">
-      <div class="prtTop">
-          <h2>Available Devices:</h2>
+    <div class="container">
+      <div class="header">
+        <h1 class="title">
+          EEG Dashboard
+        </h1>
       </div>
-      
-      <div class="prtMid">
-        <div id="divDevices" class="divDevices"></div>
-      </div>
-      
-      <div class="prtBottom">
-          <p>Select device to open and start data acquisition</p>
-      </div>
-    </div>
+      <div class="left"></div>
+      <div class="main">
+        <!--  Device discovery  -->
+        <div id="dlgDevices">
+          <div class="prtTop">
+            <h2>Available Devices:</h2>
+          </div>
+          
+          <div class="prtMid">
+            <div id="divDevices" class="divDevices"></div>
+          </div>
+          
+          <div class="prtBottom">
+              <p>Select device to open and start data acquisition</p>
+          </div>
+        </div>
 
-    <div id="dlgMain" class="dlg">
-      <div id="plotTimeSeries" class="plotTimeSeries"></div>
+        <!--  Dashboard  -->
+        <div id="dlgMain" class="dlg">
+          <div id="plotTimeSeries" class="plotTimeSeries"></div>
+        </div>
+      </div>
+      <div class="right"></div>
+      <div class="footer"></div>
     </div>
     <script src="renderer.js"></script>
   </body>

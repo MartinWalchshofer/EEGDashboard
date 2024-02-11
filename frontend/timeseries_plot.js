@@ -71,9 +71,6 @@ class TimeseriesPlot {
             xaxis: {
                 title: 't [s]', 
                 showgrid: true,
-                font: {
-                    color: 'white'
-                }
                 },
             yaxis: {
                 range: this.#range,
@@ -84,6 +81,7 @@ class TimeseriesPlot {
                 },
             plot_bgcolor: '#22333b',
             paper_bgcolor:'#22333b',
+            font: { color: 'white' },
             hovermode: false,
             dragmode: false ,
             showlegend: false,

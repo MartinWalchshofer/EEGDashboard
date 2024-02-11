@@ -56,7 +56,7 @@ class DAQSimulator:
 
     def __acquisitionThread_dowork(self):
         while self.__acquisitionRunning:
-            time.sleep(1/self.sampling_rate)
+            time.sleep(1/self.sampling_rate) #TODO CHECK ALTERNATIVES / NOT VERY PRECISE
             data = [0]*self.channel_count
             for i in range(self.channel_count):
                 data[i] = random.uniform(-10, 10)

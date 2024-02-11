@@ -29,7 +29,6 @@ def on_devices_discovered(devices):
 def on_data_available(data):
     rawDataQueue.put(data)
 
-
 @app.post("/api/")
 async def create_item(item_data: dict):
     global device
