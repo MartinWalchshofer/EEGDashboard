@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, WebSocket
 from daq_simulator import DAQSimulator
 import queue
 import json
+from framer import Framer
 
 #start with 'uvicorn daq_fastapi:app --port 5832'
 
@@ -14,9 +15,11 @@ apiClose = 'Close'
 samplingRate = 250
 numberOfChannels = 8
 rawDataFifoS = 10
+fftWindowSizeS = 4
 
 app = FastAPI() 
 device = None
+fftFramer = Framer(numberOfChannels, samplingRate * fftWindowSizeS)
 acquisitionRunning = False
 debugMessages = False
 rawDataQueue = queue.Queue(samplingRate * rawDataFifoS)
@@ -27,7 +30,8 @@ def on_devices_discovered(devices):
     discovered_devices = devices
 
 def on_data_available(data):
-    rawDataQueue.put(data)
+    fftFramer.setData(data)
+    rawDataQueue.put(data)  
 
 @app.post("/api/")
 async def create_item(item_data: dict):
@@ -81,5 +85,5 @@ async def websocket_endpoint(websocket: WebSocket):
                 print(json.dumps(f"sample: {rawDataQueue.get()}"))
             await websocket.send_text(json.dumps(f"sample: {rawDataQueue.get()}"))
     #TODO CHECK IF JAVASCRIPT SIDE IS FAST ENOUGH BUFFER MULTIPLE SAMPLES AND SEND WITH ONE PACKAGE OTHERWISE
-        #data = await websocket.receive_text() #TODO REMOVE
+    #data = await websocket.receive_text() #TODO REMOVE
         

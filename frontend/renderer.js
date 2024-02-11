@@ -2,10 +2,11 @@ const TimeseriesPlot = require('./timeseries_plot')
 const WebSocket = require('ws');
 
 //API functions
-const serverPath = 'localhost';     // TODO PUT INTO .env
-const communicationPort = '5832';   // TODO PUT INTO .env
-const apiPath = '/api/';            // TODO PUT INTO .env
-const wsPath = '/ws';               // TODO PUT INTO .env
+const serverPath = 'localhost';     //TODO LOAD FROM .env or json
+const communicationPort = '5832';   //TODO LOAD FROM .env or json
+const apiPath = '/api/';            //TODO LOAD FROM .env or json
+const wsPath = '/ws';               //TODO LOAD FROM .env or json
+const wsFrequency = '/ws-frequency';//TODO LOAD FROM .env or json
 const fullWsPath = 'ws://' + serverPath + ':' + communicationPort + wsPath; 
 const fullApiPath = 'http://' + serverPath + ':' + communicationPort + apiPath;
 const apiStartScanning = 'StartScanning'; //TODO LOAD FROM .env or json
@@ -32,7 +33,6 @@ var numberOfChannels = 0;
 const divDevices = document.getElementById('divDevices');
 const dlgDevices = document.getElementById('dlgDevices');
 const dlgMain = document.getElementById('dlgMain');
-
 const divTsPlot = document.getElementById('plotTimeSeries');
 
 //TODO: CREATE SWITCH DIALOG FUNCTION
